@@ -21,10 +21,10 @@ const particlesOptions = {
       density: {
         enable: true,
         value_area: 800,
-      }
-    }
-  }
-}
+      },
+    },
+  },
+};
 
 class App extends Component {
   constructor() {
@@ -59,7 +59,7 @@ class App extends Component {
 
   calculateFaceLocation = (data) => {
     const clarifaiFace =
-      data.response.output[0].data.regions[0].region_info.bounding_box;
+      data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById("inputimage");
     const width = Number(image.width);
     const height = Number(image.height);
@@ -116,13 +116,12 @@ class App extends Component {
     const { isSignedIn, imageUrl, route, box } = this.state;
     return (
       <div className="App">
-        <Particles className="particles" params={particlesOptions} />
-        <Navigation
-          isSignedIn={isSignedIn}
-          onRouteChange={this.onRouteChange}
+        <Particles className='particles'
+          params={particlesOptions}
         />
-        {route === "home" ? (
-          <div>
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        {route === 'home'
+          ? <div>
             <Logo />
             <Rank
               name={this.state.user.name}
@@ -130,18 +129,16 @@ class App extends Component {
             />
             <ImageLinkForm
               onInputChange={this.onInputChange}
-              onSubmit={this.onButtonSubmit}
+              onButtonSubmit={this.onButtonSubmit}
             />
             <FaceRecognition box={box} imageUrl={imageUrl} />
           </div>
-        ) : route === "signin" ? (
-          <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
-        ) : (
-          <Register
-            loadUser={this.loadUser}
-            onRouteChange={this.onRouteChange}
-          />
-        )}
+          : (
+            route === 'signin'
+              ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+              : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+          )
+        }
       </div>
     );
   }
