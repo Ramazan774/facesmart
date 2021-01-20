@@ -3,7 +3,7 @@ import Particles from "react-particles-js";
 import Clarifai from "clarifai";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import Navigation from "./components/Navigation/Navigation";
-import Signin from "./components/Signin/Signin";
+import SignIn from "./components/SignIn/SignIn";
 import Register from "./components/Register/Register";
 import Logo from "./components/Logo/Logo";
 import Rank from "./components/Rank/Rank";
@@ -135,7 +135,7 @@ class App extends Component {
           </div>
           : (
             route === 'signin'
-              ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+              ? <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
               : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
           )
         }
