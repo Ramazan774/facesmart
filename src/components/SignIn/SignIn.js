@@ -17,23 +17,47 @@ class SignIn extends React.Component {
     this.setState({ signInPassword: event.target.value })
   }
 
-  onSubmitSignIn = () => {
-    fetch('http://localhost:3001/signin', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: this.state.signInEmail,
-        password: this.state.signInPassword
-      })
-    })
-      .then(response => response.json())
-      .then(user => {
-        if (user.id) {
-          this.props.loadUser(user)
-          this.props.onRouteChange('home');
-        }
-      })
-  }
+  onSubmitSignIn = async () => {
+    const { signInEmail, signInPassword } = this.state;
+
+    if(!signInEmail || !signInPassword) {
+      this.setState({error: 'Please fill in all fields.'});
+      return;
+    }
+
+    this.setState({ isLoading: true, error: ''});
+
+    try {
+        const response = await fetch('http://localhost:3001/signin', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: signInEmail,
+          password: signInPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if(!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      if(data.id) {
+        this.props.loadUser(data);
+        this.props.onRouteChange('home');
+      } else {
+          throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+        console.error('Sigin error:', error);
+        this.setState({
+            error: error.message || 'Unable to login. Please try again.'
+        });
+    } finally {
+        this.setState({ isLoading: false});
+    }
+  };
 
   render() {
     const { onRouteChange } = this.props;
@@ -64,7 +88,7 @@ class SignIn extends React.Component {
                 />
               </div>
             </fieldset>
-            <div className="">
+            <div className="mv-3">
               <input
                 onClick={this.onSubmitSignIn}
                 className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"

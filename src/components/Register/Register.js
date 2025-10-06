@@ -22,24 +22,54 @@ class Register extends React.Component {
         this.setState({password: event.target.value})
     }
 
-    onSubmitSignIn = () => {
-        fetch('http://localhost:3001/register', {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: this.state.email,
-                password: this.state.password,
-                name: this.state.name
-            })
-        })
-            .then(response => response.json())
-            .then(user => {
-                if (user.id) {
-                    this.props.loadUser(user)
-                    this.props.onRouteChange('home');
-                }
-            })
+    onSubmitRegister = async () => {
+        const { email, password, name } = this.state;
+
+        if(!email || !password || !name) {
+            this.setState({error: 'Please fill in all fields'});
+            return;
+        }
+
+        if(password.length < 6) {
+            this.setState({error: 'Password must be at least 6 characters'});
+            return;
+        }
+
+        this.setState({ isLoading: true, error: '' });
+
+        try {
+            const response = await fetch('http://localhost:3001/register', {
+                method: 'post',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: this.state.email,
+                    password: this.state.password,
+                    name: this.state.name
+                })
+            });
+            const data = await response.json();
+
+            if(!response.ok) {
+                throw new Error(data.message || 'Registration failed');
+            }
+
+            if(data.id) {
+                this.props.loadUser(data);
+                this.props.onRouteChange('home');
+            } else {
+                throw new Error('Invalid response from server');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            this.setState({
+                error: error.message || 'Unable to register. Please try again.'
+            });
+        } finally {
+            this.setState({ isLoading: false});
+        }
     }
+
+            
 
     render() {
         return (
@@ -81,7 +111,7 @@ class Register extends React.Component {
                         </fieldset>
                         <div className="mv3">
                             <input
-                                onClick={this.onSubmitSignIn}
+                                onClick={this.onSubmitRegister}
                                 className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
                                 type="submit"
                                 value="Register"
