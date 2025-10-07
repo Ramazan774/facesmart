@@ -4,23 +4,30 @@ import "./FaceRecognition.css";
 const FaceRecognition = ({ imageUrl, box }) => {
   return (
     <div className="center ma">
-      <div className="absolute mt2">
+      <div className="absolute mt2" style={{ position: 'relative', display: 'inline-block' }}>
         <img
           id="inputimage"
-          alt="Face of a person"
+          alt=""
           src={imageUrl}
           width="500px"
           height="auto"
+          style={{ display: 'block' }}
         />
-        <div
-          className="bounding-box"
-          style={{
-            top: box.topRow,
-            right: box.rightCol,
-            bottom: box.bottomRow,
-            left: box.leftCol,
-          }}
-        ></div>
+        {box && box.topRow && (
+          <div
+            className="bounding-box"
+            style={{
+              position: 'absolute',
+              top: `${box.topRow}px`,
+              right: `${box.rightCol}px`,
+              bottom: `${box.bottomRow}px`,
+              left: `${box.leftCol}px`,
+              border: '3px solid #149df2',
+              boxShadow: '0 0 0 3px #fff inset',
+              cursor: 'pointer'
+            }}
+          ></div>
+        )}
       </div>
     </div>
   );

@@ -1,52 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-class Register extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            email: '',
-            password: '',
-            name: ''
-        }
+function Register({ onRouteChange }) {
+    const [registerEmail, setRegisterEmail] = useState('');
+    const [registerUsername, setRegisterUsername] = useState('');
+    const [registerPassword, setRegisterPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+  const onNameChange = (event) => {
+        setRegisterUsername(event.target.value);
     }
 
-    onNameChange = (event) => {
-        this.setState({name: event.target.value})
+    const onEmailChange = (event) => {
+        setRegisterEmail(event.target.value);
     }
 
-    onEmailChange = (event) => {
-        this.setState({email: event.target.value})
+    const onPasswordChange = (event) => {
+        setRegisterPassword(event.target.value);
     }
 
-    onPasswordChange = (event) => {
-        this.setState({password: event.target.value})
-    }
-
-    onSubmitRegister = async () => {
-        const { email, password, name } = this.state;
-
-        if(!email || !password || !name) {
-            this.setState({error: 'Please fill in all fields'});
+    const onSubmitRegister = async () => {
+        if(!registerEmail || !registerUsername || !registerPassword) {
+            setError('Please fill in all fields.');
             return;
         }
 
-        if(password.length < 6) {
-            this.setState({error: 'Password must be at least 6 characters'});
+        if(registerPassword.length < 6) {
+            setError('Password must be at least 6 characters');
             return;
         }
 
-        this.setState({ isLoading: true, error: '' });
+        setIsLoading(true);
+        setError('');
 
         try {
             const response = await fetch('http://localhost:3001/register', {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: this.state.email,
-                    password: this.state.password,
-                    name: this.state.name
+                    email: registerEmail,
+                    password: registerPassword,
+                    name: registerUsername
                 })
             });
+
             const data = await response.json();
 
             if(!response.ok) {
@@ -54,30 +51,39 @@ class Register extends React.Component {
             }
 
             if(data.id) {
-                this.props.loadUser(data);
-                this.props.onRouteChange('home');
+                onRouteChange('home');
             } else {
                 throw new Error('Invalid response from server');
             }
         } catch (error) {
             console.error('Registration error:', error);
-            this.setState({
-                error: error.message || 'Unable to register. Please try again.'
-            });
+            setError(
+                error.message || 'Unable to register. Please try again.'
+            );
         } finally {
-            this.setState({ isLoading: false});
+            setIsLoading(false);
         }
+     };
+
+     const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      onSubmitRegister();
     }
+  };
 
-            
-
-    render() {
         return (
             <article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
                 <main className="pa4 black-80">
                     <div className="measure">
                         <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
                             <legend className="f1 fw6 ph0 mh0">Register</legend>
+
+                            {error && (
+                                <div className="mv3 pa2 ba b--red bg-washed-red red">
+                                    {error}
+                                </div>
+                            )}
+
                             <div className="mt3">
                                 <label className="db fw6 lh-copy f6" htmlFor="name">Name</label>
                                 <input
@@ -85,9 +91,13 @@ class Register extends React.Component {
                                     type="text"
                                     name="name"
                                     id="name"
-                                    onChange={this.onNameChange}
+                                    value={registerUsername}
+                                    onChange={onNameChange}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={isLoading}
                                 />
                             </div>
+
                             <div className="mt3">
                                 <label className="db fw6 lh-copy f6" htmlFor="email-address">Email</label>
                                 <input
@@ -95,9 +105,13 @@ class Register extends React.Component {
                                     type="email"
                                     name="email-address"
                                     id="email-address"
-                                    onChange={this.onEmailChange}
+                                    value={registerEmail}
+                                    onChange={onEmailChange}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={isLoading}
                                 />
                             </div>
+
                             <div className="mv3">
                                 <label className="db fw6 lh-copy f6" htmlFor="password">Password</label>
                                 <input
@@ -105,16 +119,20 @@ class Register extends React.Component {
                                     type="password"
                                     name="password"
                                     id="password"
-                                    onChange={this.onPasswordChange}
+                                    value={registerPassword}
+                                    onChange={onPasswordChange}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={isLoading}
                                 />
                             </div>
                         </fieldset>
                         <div className="mv3">
                             <input
-                                onClick={this.onSubmitRegister}
+                                onClick={onSubmitRegister}
                                 className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
                                 type="submit"
-                                value="Register"
+                                value={isLoading ? "Registering..." : "Register"}
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
@@ -122,6 +140,6 @@ class Register extends React.Component {
             </article>
         );
     }
-}
 
-export default Register
+
+export default Register;

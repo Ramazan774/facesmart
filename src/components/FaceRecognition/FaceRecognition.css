@@ -1,8 +1,7 @@
 .bounding-box {
-  position: absolute;
-  box-shadow: 0 0 0 3px #149df2 inset;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  cursor: pointer;
+  pointer-events: none;
+}
+
+.bounding-box:hover {
+  box-shadow: 0 0 0 3px #fff inset, 0 0 20px rgba(20, 157, 242, 0.8);
 }
