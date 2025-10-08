@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Register({ onRouteChange }) {
+function Register({ loadUser, onRouteChange }) {
     const [registerEmail, setRegisterEmail] = useState('');
     const [registerUsername, setRegisterUsername] = useState('');
     const [registerPassword, setRegisterPassword] = useState('');
@@ -50,7 +50,10 @@ function Register({ onRouteChange }) {
                 throw new Error(data.message || 'Registration failed');
             }
 
-            if(data.id) {
+            if(data.user && data.token) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                loadUser(data.user);
                 onRouteChange('home');
             } else {
                 throw new Error('Invalid response from server');
@@ -139,7 +142,7 @@ function Register({ onRouteChange }) {
                 </main>
             </article>
         );
-    }
+    };
 
 
 export default Register;

@@ -39,8 +39,11 @@ function SignIn({ loadUser, onRouteChange }) {
         throw new Error(data.message || 'Login failed');
       }
 
-      if(data.id) {
-        loadUser(data);
+      if(data.user && data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        loadUser(data.user);
         onRouteChange('home');
       } else {
         throw new Error('Invalid response from server');

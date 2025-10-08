@@ -27,7 +27,27 @@ function App() {
 
   useEffect(() => {
     loadModels();
+    checkSavedSession();
   }, []);
+
+  const checkSavedSession = () => {
+    const savedUser = localStorage.getItem('user');
+    const savedToken = localStorage.getItem('token');
+
+    if (savedUser && savedToken) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setIsSignedIn(true);
+        setRoute('home');
+        console.log('User session restored');
+      } catch (err) {
+        console.error('Error parsing saved user:', err);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    }
+  }
 
   const loadModels = async () => {
     const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
@@ -47,13 +67,16 @@ function App() {
   };
 
   const loadUser = (data) => {
-    setUser({
+    const userData = {
       id: data.id,
       name: data.name,
       email: data.email,
       entries: data.entries,
       joined: data.joined
-    });
+    };
+    setUser(data);
+
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const calculateFaceLocation = (detection) => {
@@ -127,18 +150,30 @@ function App() {
       
       if (detections && detections.length > 0) {
         console.log('Detection box:', detections[0].detection.box);
+
+        const token = localStorage.getItem('token');
         
         try {
           const response = await fetch("http://localhost:3001/image", {
             method: "put",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify({
               id: user.id,
             }),
           });
+
+          if(!response.ok) {
+            throw new Error('Failed to update count');
+          }
           
           const count = await response.json();
-          setUser(prevUser => ({ ...prevUser, entries: count }));
+
+          const updatedUser = { ...user, entries: count };
+          setUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
         } catch (err) {
           console.error('Error updating count:', err);
         }
@@ -157,6 +192,8 @@ function App() {
 
   const onRouteChange = (route) => {
     if (route === "signout") {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
       setInput("");
       setImageUrl("");
       setBox({});

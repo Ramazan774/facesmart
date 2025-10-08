@@ -7,10 +7,11 @@ const FaceRecognition = ({ imageUrl, box }) => {
       <div className="absolute mt2" style={{ position: 'relative', display: 'inline-block' }}>
         <img
           id="inputimage"
-          alt=""
+          alt="Face of a person"
           src={imageUrl}
           width="500px"
           height="auto"
+          crossOrigin="anonymous"
           style={{ display: 'block' }}
         />
         {box && box.topRow && (
