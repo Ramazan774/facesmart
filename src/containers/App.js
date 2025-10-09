@@ -80,7 +80,7 @@ function App() {
   };
 
   const calculateFaceLocation = (detection) => {
-    const image = document.getElementById("inputimage");
+    // const image = document.getElementById("inputimage");
     
     const box = detection.box;
     
