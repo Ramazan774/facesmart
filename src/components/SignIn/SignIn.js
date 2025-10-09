@@ -5,6 +5,7 @@ function SignIn({ loadUser, onRouteChange }) {
   const [signInPassword, setSignInPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
   const onEmailChange = (event) => {
     setSignInEmail(event.target.value);
@@ -24,7 +25,7 @@ function SignIn({ loadUser, onRouteChange }) {
     setError('');
 
     try {
-        const response = await fetch('http://localhost:3001/signin', {
+        const response = await fetch(`${API_URL}/signin`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

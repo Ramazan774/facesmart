@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import * as faceapi from 'face-api.js';
+import * as faceapi from '@vladmandic/face-api';
 import ParticlesBg from "particles-bg";
 import FaceRecognition from "../components/FaceRecognition/FaceRecognition";
 import Navigation from "../components/Navigation/Navigation";
