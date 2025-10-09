@@ -25,6 +25,8 @@ function App() {
     joined: "",
   });
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
   useEffect(() => {
     loadModels();
     checkSavedSession();
@@ -154,7 +156,7 @@ function App() {
         const token = localStorage.getItem('token');
         
         try {
-          const response = await fetch("http://localhost:3001/image", {
+          const response = await fetch(`${API_URL}/image`, {
             method: "put",
             headers: { 
               "Content-Type": "application/json",

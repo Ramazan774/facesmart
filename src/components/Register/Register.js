@@ -7,7 +7,9 @@ function Register({ loadUser, onRouteChange }) {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-  const onNameChange = (event) => {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
+    const onNameChange = (event) => {
         setRegisterUsername(event.target.value);
     }
 
@@ -34,7 +36,7 @@ function Register({ loadUser, onRouteChange }) {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:3001/register', {
+            const response = await fetch(`${API_URL}/register`, {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
