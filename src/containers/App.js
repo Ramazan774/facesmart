@@ -47,7 +47,7 @@ function App() {
         localStorage.removeItem('token');
       }
     }
-  }
+  };
 
   const loadModels = async () => {
     const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
@@ -74,22 +74,21 @@ function App() {
       entries: data.entries,
       joined: data.joined
     };
-    setUser(data);
-
+    
+    setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const calculateFaceLocation = (detection) => {
     const image = document.getElementById("inputimage");
-    const width = Number(image.width);
-    const height = Number(image.height);
+    
     const box = detection.box;
     
     return {
       leftCol: box.x,
       topRow: box.y,
-      rightCol: width - (box.x + box.width),  
-      bottomRow: height - (box.y + box.height)
+      width: box.width,
+      height: box.height
     };
   };
 
@@ -102,7 +101,6 @@ function App() {
   };
 
   const onButtonSubmit = async () => {
-    console.log('Detect button clicked');
     
     if (!modelsLoaded) {
       alert('Face detection models are still loading. Please wait...');
@@ -113,11 +111,9 @@ function App() {
       alert('Please enter an image URL!');
       return;
     }
-
-    console.log('Setting image URL:', input);
     setImageUrl(input);
     
-    setTimeout(async () => {
+    setTimeout(() => {
       const img = document.getElementById("inputimage");
       
       if (!img) {
@@ -125,32 +121,36 @@ function App() {
         return;
       }
 
-      if (!img.complete) {
-        img.onload = () => detectFaces(img);
-        img.onerror = () => {
-          alert('Failed to load image. Try a different URL or use images from Unsplash.');
-        };
-      } else {
-        detectFaces(img);
-      }
-    }, 300);
+      const waitForImageLoad = () => {
+        if (img.complete && img.naturalWidth > 0) {
+          detectFaces(img);
+        } else {
+          img.onload = () => {
+            detectFaces(img);
+          };
+          img.onerror = (e) => {
+            alert('Failed to load image. Try a different URL or use images from Unsplash.');
+          };
+        }
+      };
+
+      waitForImageLoad();
+    }, 500);
   };
 
   const detectFaces = async (img) => {
     try {
-      console.log('Starting face detection...');
-      console.log('Image dimensions:', img.width, 'x', img.height);
+      if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
+        alert('Image failed to load. Please try again.');
+        return;
+      }
 
       const detections = await faceapi
         .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
         .withFaceExpressions();
-
-      console.log('Detections found:', detections.length);
       
       if (detections && detections.length > 0) {
-        console.log('Detection box:', detections[0].detection.box);
-
         const token = localStorage.getItem('token');
         
         try {
@@ -164,13 +164,13 @@ function App() {
               id: user.id,
             }),
           });
-
-          if(!response.ok) {
+          
+          if (!response.ok) {
             throw new Error('Failed to update count');
           }
           
           const count = await response.json();
-
+          
           const updatedUser = { ...user, entries: count };
           setUser(updatedUser);
           localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -179,13 +179,11 @@ function App() {
         }
         
         const box = calculateFaceLocation(detections[0].detection);
-        console.log('Calculated box:', box);
         displayFaceBox(box);
       } else {
         alert('No faces detected in this image. Try another one!');
       }
     } catch (error) {
-      console.error('Error detecting face:', error);
       alert('Error detecting face: ' + error.message);
     }
   };
@@ -194,6 +192,7 @@ function App() {
     if (route === "signout") {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      
       setInput("");
       setImageUrl("");
       setBox({});

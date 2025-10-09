@@ -14,18 +14,19 @@ const FaceRecognition = ({ imageUrl, box }) => {
           crossOrigin="anonymous"
           style={{ display: 'block' }}
         />
-        {box && box.topRow && (
+        {box && box.width && (
           <div
             className="bounding-box"
             style={{
               position: 'absolute',
               top: `${box.topRow}px`,
-              right: `${box.rightCol}px`,
-              bottom: `${box.bottomRow}px`,
               left: `${box.leftCol}px`,
+              width: `${box.width}px`,
+              height: `${box.height}px`,
               border: '3px solid #149df2',
               boxShadow: '0 0 0 3px #fff inset',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxSizing: 'border-box'
             }}
           ></div>
         )}
