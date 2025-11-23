@@ -1,17 +1,18 @@
 import React from "react";
 import "./FaceRecognition.css";
 
-const FaceRecognition = ({ url, box }) => {
+const FaceRecognition = ({ imageUrl, box, onImageLoad }) => {
   return (
     <div className="center ma">
       <div className="absolute mt2" style={{ position: 'relative', display: 'inline-block' }}>
         <img
           id="inputimage"
-          alt=""
-          src={url}
+          alt="Insert url from https://unsplash.com/s/photos/people-face"
+          src={imageUrl}
           width="500px"
           height="auto"
           crossOrigin="anonymous"
+          onLoad={onImageLoad}
           style={{ display: 'block' }}
         />
         {box && box.width && (

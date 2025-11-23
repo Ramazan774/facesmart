@@ -81,13 +81,13 @@ function App() {
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
-  const calculateFaceLocation = (detection) => {
-    const image = document.getElementById("inputimage");
-    const displayedWidth = Number(image.width);
-    const displayedHeight = Number(image.height); 
+  const calculateFaceLocation = (detection, imgElement) => {
+    // const image = document.getElementById("inputimage");
+    const displayedWidth = Number(imgElement.width);
+    const displayedHeight = Number(imgElement.height); 
 
-    const originalWidth = Number(image.naturalWidth);
-    const originalHeight = Number(image.naturalHeight);
+    const originalWidth = Number(imgElement.naturalWidth);
+    const originalHeight = Number(imgElement.naturalHeight);
 
     const box = detection.box;
     
@@ -110,7 +110,7 @@ function App() {
     setInput(event.target.value);
   };
 
-  const onButtonSubmit = async () => {
+  const onButtonSubmit = () => {
     
     if (!modelsLoaded) {
       alert('Face detection models are still loading. Please wait...');
@@ -122,29 +122,15 @@ function App() {
       return;
     }
     setImageUrl(input);
-    
-    setTimeout(() => {
-      const img = document.getElementById("inputimage");
-      
-      if (!img) {
-        console.error('Image element not found');
-        return;
-      }
+    setBox({});
+  };
 
-      const waitForImageLoad = () => {
-        if (img.complete && img.naturalWidth > 0) {
-          detectFaces(img);
-        } else {
-          img.onload = () => {
-            detectFaces(img);
-          };
-          img.onerror = (e) => {
-            alert('Failed to load image. Try a different URL or use images from Unsplash.');
-          };
-        }
-      };
-      waitForImageLoad();
-    }, 500);
+  const onImageLoad = (event) => {
+    const img =  event.target;
+
+    if (img && img.naturalWidth > 0) {
+      detectFaces(img);
+    }
   };
 
   const detectFaces = async (img) => {
@@ -187,7 +173,7 @@ function App() {
           console.error('Error updating count:', err);
         }
         
-        const box = calculateFaceLocation(detections[0].detection);
+        const box = calculateFaceLocation(detections[0].detection, img);
         displayFaceBox(box);
       } else {
         alert('No faces detected in this image. Try another one!');
@@ -237,7 +223,11 @@ function App() {
               onInputChange={onInputChange}
               onButtonSubmit={onButtonSubmit}
             />
-            <FaceRecognition box={box} imageUrl={imageUrl} />
+            <FaceRecognition 
+              box={box} 
+              imageUrl={imageUrl} 
+              onImageLoad={onImageLoad}
+            />
             {!modelsLoaded && (
               <p style={{ color: 'white' }}>Loading face detection models...</p>
             )}
