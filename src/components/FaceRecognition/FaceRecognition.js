@@ -1,14 +1,14 @@
 import React from "react";
 import "./FaceRecognition.css";
 
-const FaceRecognition = ({ imageUrl, box }) => {
+const FaceRecognition = ({ url, box }) => {
   return (
     <div className="center ma">
       <div className="absolute mt2" style={{ position: 'relative', display: 'inline-block' }}>
         <img
           id="inputimage"
-          alt="Face of a person"
-          src={imageUrl}
+          alt=""
+          src={url}
           width="500px"
           height="auto"
           crossOrigin="anonymous"

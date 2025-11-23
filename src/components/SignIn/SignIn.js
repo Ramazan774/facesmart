@@ -126,6 +126,10 @@ function SignIn({ loadUser, onRouteChange }) {
               Register
             </p>
           </div>
+          <div>
+            <p>Email: user@gmail.com</p>
+            <p>Password: demo123</p>
+          </div>
         </div>
       </main>
     </article>
