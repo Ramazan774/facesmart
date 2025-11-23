@@ -82,15 +82,23 @@ function App() {
   };
 
   const calculateFaceLocation = (detection) => {
-    // const image = document.getElementById("inputimage");
-    
+    const image = document.getElementById("inputimage");
+    const displayedWidth = Number(image.width);
+    const displayedHeight = Number(image.height); 
+
+    const originalWidth = Number(image.naturalWidth);
+    const originalHeight = Number(image.naturalHeight);
+
     const box = detection.box;
     
+    const scaleX = displayedWidth / originalWidth;
+    const scaleY = displayedHeight / originalHeight;
+
     return {
-      leftCol: box.x,
-      topRow: box.y,
-      width: box.width,
-      height: box.height
+      leftCol: box.x * scaleX,
+      topRow: box.y * scaleY,
+      width: box.width * scaleX,
+      height: box.height * scaleY
     };
   };
 
@@ -135,7 +143,6 @@ function App() {
           };
         }
       };
-
       waitForImageLoad();
     }, 500);
   };
